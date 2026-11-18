@@ -1,0 +1,36 @@
+package com.exg.mygame.repository;
+
+import com.codename1.orm.repository.CrudRepository;
+import com.codename1.orm.repository.Modifying;
+import com.codename1.orm.repository.Param;
+import com.codename1.orm.repository.Query;
+import com.codename1.orm.repository.Repository;
+import com.exg.mygame.domain.Card;
+
+import java.util.List;
+
+/// Cards. Freezing is one conditional update, so it takes effect for the next
+/// authorization whatever is in flight.
+@Repository(entity = Card.class, key = String.class)
+public interface CardRepository extends CrudRepository<Card, String> {
+    List<Card> findByOwnerOrderByCreatedAtAsc(String owner);
+
+    Card findFirstByAccountId(String accountId);
+
+    @Modifying
+    @Query("update Card c set c.frozen = :frozen where c.id = :id and c.owner = :owner")
+    int setFrozen(@Param("id") String id, @Param("owner") String owner,
+            @Param("frozen") boolean frozen);
+
+    @Modifying
+    @Query("update Card c set c.dailyLimit = :limit where c.id = :id and c.owner = :owner")
+    int setLimit(@Param("id") String id, @Param("owner") String owner,
+            @Param("limit") long limit);
+
+    /// Writes the row without changing it, holding it until the transaction
+    /// ends: a spend reads the card's state behind it, so a freeze or a new
+    /// limit committed meanwhile is the one it sees.
+    @Modifying
+    @Query("update Card c set c.frozen = c.frozen where c.id = :id")
+    int hold(@Param("id") String id);
+}

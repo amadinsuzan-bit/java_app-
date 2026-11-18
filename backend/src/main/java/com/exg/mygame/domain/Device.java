@@ -1,0 +1,103 @@
+package com.exg.mygame.domain;
+
+import java.time.Instant;
+import com.codename1.annotations.Column;
+import com.codename1.annotations.Entity;
+import com.codename1.annotations.Id;
+
+/// A device's request-signing key and what it said about itself when it
+/// registered.
+@Entity
+public class Device {
+    @Id(autoIncrement = false)
+    @Column(nullable = false, type = "VARCHAR(32)")
+    private String id = "";
+
+    @Column(nullable = false, type = "VARCHAR(190)")
+    private String owner = "";
+
+    @Column(nullable = false, type = "VARCHAR(400)")
+    private String publicKey = "";
+
+    @Column(nullable = false, type = "VARCHAR(20)")
+    private String platform = "";
+
+    @Column(nullable = false)
+    private boolean rooted;
+
+    @Column(nullable = false)
+    private boolean attested;
+
+    @Column(nullable = false)
+    private boolean revoked;
+
+    @Column(nullable = false)
+    private Instant createdAt = Instant.EPOCH;
+
+    public Device() {
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+
+    public String getPublicKey() {
+        return publicKey;
+    }
+
+    public void setPublicKey(String publicKey) {
+        this.publicKey = publicKey;
+    }
+
+    public String getPlatform() {
+        return platform;
+    }
+
+    public void setPlatform(String platform) {
+        this.platform = platform;
+    }
+
+    public boolean isRooted() {
+        return rooted;
+    }
+
+    public void setRooted(boolean rooted) {
+        this.rooted = rooted;
+    }
+
+    public boolean isAttested() {
+        return attested;
+    }
+
+    public void setAttested(boolean attested) {
+        this.attested = attested;
+    }
+
+    public boolean isRevoked() {
+        return revoked;
+    }
+
+    public void setRevoked(boolean revoked) {
+        this.revoked = revoked;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+}

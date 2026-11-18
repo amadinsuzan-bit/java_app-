@@ -1,0 +1,9 @@
+package com.exg.mygame.api;
+
+import com.codename1.annotations.Mapped;
+
+/// A virtual card on a checking account. Only the last four digits exist
+/// here: the full number is the card processor's, and never stored.
+@Mapped
+public record CardDto(String id, String accountId, String last4, boolean frozen, long dailyLimit, long createdAt) {
+}

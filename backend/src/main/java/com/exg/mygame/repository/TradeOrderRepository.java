@@ -1,0 +1,42 @@
+package com.exg.mygame.repository;
+
+import com.codename1.orm.repository.CrudRepository;
+import com.codename1.orm.repository.Param;
+import com.codename1.orm.repository.Query;
+import com.codename1.orm.repository.Repository;
+import com.exg.mygame.domain.TradeOrder;
+
+import java.util.List;
+
+@Repository(entity = TradeOrder.class, key = String.class)
+public interface TradeOrderRepository extends CrudRepository<TradeOrder, String> {
+    TradeOrder findFirstByOwnerAndClientKey(String owner, String clientKey);
+
+    List<TradeOrder> findByOwnerAndStatusOrderByCreatedAtDesc(String owner, String status);
+
+    List<TradeOrder> findByMarketAndStatus(String market, String status);
+
+    /// The sells a buy at `price` crosses, best (lowest) first, then oldest.
+    @Query("select o from TradeOrder o where o.market = :market and o.side = :side "
+            + "and o.status = :status and o.price <= :price order by o.price asc, o.seq asc")
+    List<TradeOrder> asks(@Param("market") String market, @Param("side") String side,
+            @Param("status") String status, @Param("price") long price);
+
+    /// The buys a sell at `price` crosses, best (highest) first, then oldest.
+    @Query("select o from TradeOrder o where o.market = :market and o.side = :side "
+            + "and o.status = :status and o.price >= :price order by o.price desc, o.seq asc")
+    List<TradeOrder> bids(@Param("market") String market, @Param("side") String side,
+            @Param("status") String status, @Param("price") long price);
+
+    /// The market of `owner`'s order `id`, or null. A projection, not the
+    /// row: an order loaded before its market's lock stays in the session
+    /// as it was read, and a re-read behind the lock would answer that copy
+    /// rather than what a concurrent fill committed.
+    @Query("select o.market from TradeOrder o where o.id = :id and o.owner = :owner")
+    String marketOf(@Param("id") String id, @Param("owner") String owner);
+
+    @Query("select sum(o.held) from TradeOrder o where o.owner = :owner and o.status = :status "
+            + "and o.side = :side")
+    Long held(@Param("owner") String owner, @Param("status") String status,
+            @Param("side") String side);
+}

@@ -1,0 +1,33 @@
+package com.exg.mygame;
+
+import com.codename1.backend.Crypto;
+
+import java.io.IOException;
+
+/// Identifiers and the hashes the ledger and the audit chain are built on.
+public final class Ids {
+    private static final char[] HEX = "0123456789abcdef".toCharArray();
+
+    private Ids() {
+    }
+
+    /// 128 random bits as hex. Every id in this server is one: nothing is a
+    /// counter, so no id says how many customers or transfers there are, and
+    /// none can be guessed from another.
+    public static String next() throws IOException {
+        return hex(Crypto.randomBytes(16));
+    }
+
+    public static String hex(byte[] bytes) {
+        char[] out = new char[bytes.length * 2];
+        for (int iter = 0; iter < bytes.length; iter++) {
+            out[iter * 2] = HEX[(bytes[iter] >> 4) & 0xf];
+            out[iter * 2 + 1] = HEX[bytes[iter] & 0xf];
+        }
+        return new String(out);
+    }
+
+    public static String sha256(String text) throws IOException {
+        return hex(Crypto.sha256(text.getBytes("UTF-8")));
+    }
+}
